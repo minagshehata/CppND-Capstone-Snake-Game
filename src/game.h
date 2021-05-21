@@ -7,6 +7,13 @@
 #include "renderer.h"
 #include "snake.h"
 
+
+class SpecialMealClass : public SDL_Point
+{
+  private : 
+    int TimeOutInSecs = 10 ; 
+};
+
 class Game {
  public:
   Game(std::size_t grid_width, std::size_t grid_height);
@@ -18,6 +25,8 @@ class Game {
  private:
   Snake snake;
   SDL_Point food;
+  bool LunchTime = false; 
+  SpecialMealClass SpecialMeal ; 
 
   std::random_device dev;
   std::mt19937 engine;
@@ -27,6 +36,7 @@ class Game {
   int score{0};
 
   void PlaceFood();
+  void PlaceSpecialMeal();
   void Update();
 };
 
