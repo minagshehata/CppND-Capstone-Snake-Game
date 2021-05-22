@@ -3,8 +3,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_definitions(-std=c++17)
-
-set(CXX_FLAGS "-Wall" "sdl2-config" "--cflags" "--libs")
+set(CXX_FLAGS "-pthread" "-Wall" "sdl2-config" "--cflags" "--libs")
 
 set(CMAKE_CXX_FLAGS, "${CXX_FLAGS}")
 
@@ -17,4 +16,4 @@ include_directories(${SDL2_INCLUDE_DIRS} src)
 
 add_executable(SnakeGame src/main.cpp src/game.cpp src/controller.cpp src/renderer.cpp src/snake.cpp)
 string(STRIP ${SDL2_LIBRARIES} SDL2_LIBRARIES)
-target_link_libraries(SnakeGame ${SDL2_LIBRARIES})
+target_link_libraries(SnakeGame ${SDL2_LIBRARIES} -lpthread) 

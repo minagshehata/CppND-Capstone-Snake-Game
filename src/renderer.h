@@ -5,6 +5,18 @@
 #include "SDL.h"
 #include "snake.h"
 
+class SpecialMealSpecs
+{
+  public :
+    long remainingTimeInSecs ; 
+    std::vector<int> rgb {0xff , 0xFF , 0XFF};
+    bool isReached = false ;
+    bool timedOut = false ;
+    int pos_x = 0 ; 
+    int pos_y = 0 ; 
+};
+
+
 class Renderer {
  public:
   Renderer(const std::size_t screen_width, const std::size_t screen_height,
@@ -12,7 +24,7 @@ class Renderer {
   ~Renderer();
 
   void Render(Snake const snake, SDL_Point const &food);
-  void Render(Snake const snake, SDL_Point const &food , SDL_Point const &SpecialMeal);
+  void Render(Snake const snake, SDL_Point const &food , SpecialMealSpecs const &SpecialMeal);
   void UpdateWindowTitle(int score, int fps);
 
  private:
