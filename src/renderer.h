@@ -26,6 +26,7 @@ class Renderer {
   void Render(Snake const snake, SDL_Point const &food);
   void Render(Snake const snake, SDL_Point const &food , SpecialMealSpecs const &SpecialMeal);
   void UpdateWindowTitle(int score, int fps);
+  void UpdateWindowTitle(int score, int fps , int remaining_time) ;
 
  private:
   SDL_Window *sdl_window;

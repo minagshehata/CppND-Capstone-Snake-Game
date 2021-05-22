@@ -45,7 +45,15 @@ void Game::Run(Controller const &controller, Renderer &renderer,
 
     // After every second, update the window title.
     if (frame_end - title_timestamp >= 1000) {
-      renderer.UpdateWindowTitle(score, frame_count);
+      if (!LunchTime)
+      {
+        renderer.UpdateWindowTitle(score, frame_count);
+      }
+      else
+      {
+        renderer.UpdateWindowTitle(score, frame_count, _SpecialMealSpecsInstance.remainingTimeInSecs +1);
+      }
+
       frame_count = 0;
       title_timestamp = frame_end;
     }
@@ -88,10 +96,10 @@ void Game::Update() {
     score++;
     SpecialMealCounter ++ ; 
     PlaceFood();
-    if( (SpecialMealCounter == 3 ) && (!LunchTime))
+    if( (SpecialMealCounter >= 3 ) && (!LunchTime))
     {
       SpecialMealCounter = 0 ; 
-       LunchTime = true ;
+       
        OrderSpecialMeal(); 
     }
     // Grow snake and increase speed.
@@ -100,8 +108,9 @@ void Game::Update() {
   }
   if (!queue->isEmpty())
   {
-       auto temp_SpecialMealSpecsInstance = std::move( queue->receive() );
-      if(temp_SpecialMealSpecsInstance.isReached)
+       _SpecialMealSpecsInstance =  queue->receive();
+       LunchTime = true ;
+      if(_SpecialMealSpecsInstance.isReached)
       {
           score += 3 ;
           LunchTime = false ;
@@ -109,16 +118,10 @@ void Game::Update() {
           snake.GrowBody();
           snake.speed += 0.02;
       }
-      else if (temp_SpecialMealSpecsInstance.timedOut)
+      else if (_SpecialMealSpecsInstance.timedOut)
       {
          LunchTime = false ;
       }
-      _SpecialMealSpecsInstance.isReached = temp_SpecialMealSpecsInstance.isReached;
-      _SpecialMealSpecsInstance.pos_x = temp_SpecialMealSpecsInstance.pos_x ; 
-      _SpecialMealSpecsInstance.pos_y = temp_SpecialMealSpecsInstance.pos_y ; 
-      _SpecialMealSpecsInstance.remainingTimeInSecs = temp_SpecialMealSpecsInstance.remainingTimeInSecs ; 
-      _SpecialMealSpecsInstance.rgb = temp_SpecialMealSpecsInstance.rgb ; 
-      _SpecialMealSpecsInstance.timedOut = temp_SpecialMealSpecsInstance.timedOut ; 
   }
 }
 
@@ -158,8 +161,7 @@ void SpecialMealInterface::RunSpecialMeal( int food_x, int food_y ,Snake *snake,
       int new_y = static_cast<int>(snake->head_y);
       // check snake positioning 
       
-
-      if ((SpecialMealInstanse->x == new_x) && (SpecialMealInstanse->y == new_y) )
+      if( snake->SnakeCell(SpecialMealInstanse->x, SpecialMealInstanse->y) )
       {
         SpecialMealSpecsInstance.isReached = true ;
         SpecialMealSpecsInstance.remainingTimeInSecs = 0 ; 

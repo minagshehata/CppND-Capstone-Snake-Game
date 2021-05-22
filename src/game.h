@@ -53,7 +53,7 @@ class SpecialMealClass : public SDL_Point
 {
   public : 
      SpecialMealClass() {};
-    int TimeOutInSecs = 10 ; 
+    int TimeOutInSecs = 5 ; 
 };
 
 
