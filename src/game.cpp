@@ -93,12 +93,10 @@ void Game::Update() {
     // Grow snake and increase speed.
     snake.GrowBody();
   //  snake.speed += 0.02;
-  std::cout << "sha5a 3 \n";
   }
   if (!queue->isEmpty())
   {
-     std::cout << "sha5a 1 \n";
-    _SpecialMealSpecsInstance = queue->receive();
+    _SpecialMealSpecsInstance = std::move( queue->receive() );
       if(_SpecialMealSpecsInstance.isReached)
       {
           score += 3 ;
@@ -106,33 +104,20 @@ void Game::Update() {
           // Grow snake and increase speed.
           snake.GrowBody();
           snake.speed += 0.02;
-          std::cout << "sha5a 2 \n";
       }
       else if (_SpecialMealSpecsInstance.timedOut)
       {
          LunchTime = false ;
-         std::cout << "sha5a 3 \n";
       }
   }
-  // if ((SpecialMeal.x == new_x) && (SpecialMeal.y == new_y)
-  // && (LunchTime))
-  // {
-  //   score += 3 ;
-  //   LunchTime = false ;
-  //       // Grow snake and increase speed.
-  //   snake.GrowBody();
-  //  // snake.speed += 0.02;
-  // }
 }
 
 void Game::OrderSpecialMeal()
 {
   std::unique_ptr<SpecialMealInterface> SpecialMealIf = std::make_unique<SpecialMealInterface>(this->grid_width ,this->grid_height);
   
-  std::cout << "Miza\n";
-  SpecialMealThreads.emplace_back (std::async(std::launch::async,&SpecialMealInterface::RunSpecialMeal, std::move(SpecialMealIf) ,
+  SpecialMealThreads =(std::async(std::launch::async,&SpecialMealInterface::RunSpecialMeal, std::move(SpecialMealIf) ,
                         this->food.x, this->food.y, &this->snake , this->queue )) ;
-    std::cout << "Mi5a\n";
 }
 int Game::GetScore() const { return score; }
 int Game::GetSize() const { return snake.size; }
@@ -151,12 +136,10 @@ void SpecialMealInterface::RunSpecialMeal( int food_x, int food_y ,Snake *snake,
   long blinkTime = SDL_GetTicks(); 
   long timeDifference = 0;
   bool blinkFlag = false ;
-   std::cout << "SHA7A 1 \n";
   // receive msg q from game to have 
   PlaceSpecialMeal(food_x , food_y , *snake);
   SpecialMealSpecsInstance.pos_x = SpecialMealInstanse->x;
   SpecialMealSpecsInstance.pos_y = SpecialMealInstanse->y;
-  std::cout << "SHA7A 2 \n";
   while (true)
   {
       currentTime = SDL_GetTicks(); 
@@ -171,7 +154,6 @@ void SpecialMealInterface::RunSpecialMeal( int food_x, int food_y ,Snake *snake,
         SpecialMealSpecsInstance.isReached = true ;
         SpecialMealSpecsInstance.remainingTimeInSecs = 0 ; 
         SpecialMealSpecsInstance.timedOut = false ; 
-        std::cout << "A7A 1 \n";
         //update status 
         break ; 
       }
@@ -191,7 +173,6 @@ void SpecialMealInterface::RunSpecialMeal( int food_x, int food_y ,Snake *snake,
           SpecialMealSpecsInstance.rgb = {0, 191, 255} ; 
         else
           SpecialMealSpecsInstance.rgb = {240, 15, 255} ; 
-          std::cout << "A7A 2 \n";
       }
       else
       {
@@ -199,33 +180,26 @@ void SpecialMealInterface::RunSpecialMeal( int food_x, int food_y ,Snake *snake,
         SpecialMealSpecsInstance.remainingTimeInSecs = 0 ; ; 
         SpecialMealSpecsInstance.timedOut = true ; 
         break ; 
-        std::cout << "A7A 3 \n";
       }
       queue->send(std::move(SpecialMealSpecsInstance));
       
   }
   queue->send(std::move(SpecialMealSpecsInstance));
-  std::cout << "A7A\n";
 }
 
 
 void SpecialMealInterface::PlaceSpecialMeal(int food_x, int food_y , Snake snake){
   int x, y;
   while (true) {
-    std::cout << "444444\n";
     x = random_w(engine);
     y = random_h(engine);
-    std::cout << "333333\n";
     // Check that the location is not occupied by a snake item before placing
     // food.
     if (!snake.SnakeCell(x, y)) {
-      std::cout << "22222\n";
       if ((food_x != x) && (food_y != y) )
       {
-          std::cout << "11111\n";
         SpecialMealInstanse->x = x;
         SpecialMealInstanse->y = y;
-        std::cout << "Mina\n";
         return;
       }
     }

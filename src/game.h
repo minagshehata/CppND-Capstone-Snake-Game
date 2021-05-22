@@ -81,13 +81,13 @@ class Game {
            std::size_t target_frame_duration);
   int GetScore() const;
   int GetSize() const;
-
+  
  private:
   Snake snake;
   SDL_Point food;
   bool LunchTime = false; 
   SpecialMealSpecs _SpecialMealSpecsInstance ; 
-  std::vector<std::future<void>>SpecialMealThreads;
+  std::future<void> SpecialMealThreads;
   std::shared_ptr<MessageQueue<SpecialMealSpecs>> queue = std::make_shared<MessageQueue<SpecialMealSpecs>>();
 
   std::random_device dev;
