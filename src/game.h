@@ -87,7 +87,7 @@ class Game {
   SDL_Point food;
   bool LunchTime = false; 
   SpecialMealSpecs _SpecialMealSpecsInstance ; 
-  std::future<void> SpecialMealThreads;
+  std::future<void> SpecialMealThread;
   std::shared_ptr<MessageQueue<SpecialMealSpecs>> queue = std::make_shared<MessageQueue<SpecialMealSpecs>>();
 
   std::random_device dev;

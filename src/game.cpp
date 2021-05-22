@@ -96,51 +96,65 @@ void Game::Update() {
     score++;
     SpecialMealCounter ++ ; 
     PlaceFood();
+
+    /*check if special meal time started*/
     if( (SpecialMealCounter >= 3 ) && (!LunchTime))
     {
-      SpecialMealCounter = 0 ; 
-       
-       OrderSpecialMeal(); 
+      SpecialMealCounter = 0 ;    
+      /* trigger special meal handling */
+      OrderSpecialMeal(); 
     }
-    // Grow snake and increase speed.
+    /* Grow snake and increase speed.*/
     snake.GrowBody();
     snake.speed += 0.02;
   }
+  /* check that the message queue has data inside */
   if (!queue->isEmpty())
   {
+      /* receive the queued data from the parallel thread and take the required action*/
        _SpecialMealSpecsInstance =  queue->receive();
-       LunchTime = true ;
+       
       if(_SpecialMealSpecsInstance.isReached)
       {
-          score += 3 ;
-          LunchTime = false ;
-          // Grow snake and increase speed.
-          snake.GrowBody();
-          snake.speed += 0.02;
+        /* increase the score three points*/
+        score += 3 ;
+        /* lunch time has ended */
+        LunchTime = false ;
+        /* Grow snake and increase speed. */
+        snake.GrowBody();
+        snake.speed += 0.02;
       }
       else if (_SpecialMealSpecsInstance.timedOut)
       {
-         LunchTime = false ;
+        /* lunch time has ended */
+        LunchTime = false ;
+      }
+      else
+      {
+        /* lunch time for special meal */
+        LunchTime = true ;
       }
   }
 }
-
+/* method to trigger special meal thread*/
 void Game::OrderSpecialMeal()
 {
+  /* unique pointer allocating in heap temporary instance of the object SpecialMealInterface*/
   std::unique_ptr<SpecialMealInterface> SpecialMealIf = std::make_unique<SpecialMealInterface>(this->grid_width ,this->grid_height);
-  
-  SpecialMealThreads = (std::async(std::launch::async,&SpecialMealInterface::RunSpecialMeal, std::move(SpecialMealIf) ,
+  /* trigget the concurrent function asyncronously */
+  SpecialMealThread = (std::async(std::launch::async,&SpecialMealInterface::RunSpecialMeal, std::move(SpecialMealIf) ,
                         this->food.x, this->food.y, &this->snake , this->queue )) ;
 }
 int Game::GetScore() const { return score; }
 int Game::GetSize() const { return snake.size; }
 
+/* SpecialMealInterface constructor*/
 SpecialMealInterface::SpecialMealInterface(std::size_t grid_width, std::size_t grid_height)
     : engine(dev()),
       random_w(0, static_cast<int>(grid_width - 1)),
       random_h(0, static_cast<int>(grid_height - 1)) {
 }
-
+/* the main function of the special meal thread*/
 void SpecialMealInterface::RunSpecialMeal( int food_x, int food_y ,Snake *snake, std::shared_ptr<MessageQueue<SpecialMealSpecs>> queue )
 {
   SpecialMealSpecs SpecialMealSpecsInstance ;
@@ -149,67 +163,75 @@ void SpecialMealInterface::RunSpecialMeal( int food_x, int food_y ,Snake *snake,
   long blinkTime = SDL_GetTicks(); 
   long timeDifference = 0;
   bool blinkFlag = false ;
-  // receive msg q from game to have 
+  /* place the special meal*/ 
   PlaceSpecialMeal(food_x , food_y , *snake);
   SpecialMealSpecsInstance.pos_x = SpecialMealInstanse->x;
   SpecialMealSpecsInstance.pos_y = SpecialMealInstanse->y;
   while (true)
   {
+      /* check the elabsed time from the starting of the thread */
       currentTime = SDL_GetTicks(); 
       timeDifference = currentTime - initialTime ;
       int new_x = static_cast<int>(snake->head_x);
       int new_y = static_cast<int>(snake->head_y);
-      // check snake positioning 
-      
+      /* check if the snake  get the special meal*/ 
       if( snake->SnakeCell(SpecialMealInstanse->x, SpecialMealInstanse->y) )
       {
+        /* update the the related flags and the reamining time*/
         SpecialMealSpecsInstance.isReached = true ;
         SpecialMealSpecsInstance.remainingTimeInSecs = 0 ; 
         SpecialMealSpecsInstance.timedOut = false ; 
-        //update status 
         break ; 
       }
+      /* the normal case : not time out and the snake still doesn't find the special meal*/
       else if (timeDifference < SpecialMealInstanse->TimeOutInSecs*1000)
       {
-        
-       // blink color ; 
+        /* update the the related flags and the reamining time*/
         SpecialMealSpecsInstance.isReached = false ;
         SpecialMealSpecsInstance.remainingTimeInSecs = ((SpecialMealInstanse->TimeOutInSecs*1000 ) - timeDifference) /1000 ; ; 
         SpecialMealSpecsInstance.timedOut = false ; 
+        /* Blink the color of the special meal between two colors every 500ms*/
+        /* flip the flag each 500ms*/
         if ((currentTime - blinkTime) > 500)
         {
           blinkTime = currentTime ;
           blinkFlag = !blinkFlag;
         }
+        /* change the color*/
         if (blinkFlag)
           SpecialMealSpecsInstance.rgb = {0, 191, 255} ; 
         else
           SpecialMealSpecsInstance.rgb = {240, 15, 255} ; 
       }
-      else
+      else /* TimeOut :  in case the configured time is elabsed */
       {
+        /* update the the related flags and the reamining time*/
         SpecialMealSpecsInstance.isReached = false ;
         SpecialMealSpecsInstance.remainingTimeInSecs = 0 ; ; 
         SpecialMealSpecsInstance.timedOut = true ; 
         break ; 
       }
+      /* send data in queue after each cycle */
       queue->send(std::move(SpecialMealSpecsInstance));
       
   }
+  /* send the final status of data after TimeOut or the snake get the special meal*/
   queue->send(std::move(SpecialMealSpecsInstance));
 }
 
-
+/* method to get the new location of the special meal */
 void SpecialMealInterface::PlaceSpecialMeal(int food_x, int food_y , Snake snake){
   int x, y;
   while (true) {
+    /* get random values for x and y */
     x = random_w(engine);
     y = random_h(engine);
-    // Check that the location is not occupied by a snake item before placing
-    // food.
+    /* Check that the location is not occupied by a snake item before placing special meal.*/
     if (!snake.SnakeCell(x, y)) {
+      /* check that the location is not occupied by the normal food */
       if ((food_x != x) && (food_y != y) )
       {
+        /*update the location*/
         SpecialMealInstanse->x = x;
         SpecialMealInstanse->y = y;
         return;
