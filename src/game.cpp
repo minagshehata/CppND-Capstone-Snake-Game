@@ -28,9 +28,13 @@ void Game::Run(Controller const &controller, Renderer &renderer,
     controller.HandleInput(running, snake);
     Update();
     if (!LunchTime)
-    renderer.Render(snake, food);
+    {
+      renderer.Render(snake, food);
+    }
     else 
-    renderer.Render(snake, food , _SpecialMealSpecsInstance) ;
+    {
+      renderer.Render(snake, food , _SpecialMealSpecsInstance) ;
+    }
 
     frame_end = SDL_GetTicks();
 
@@ -92,12 +96,12 @@ void Game::Update() {
     }
     // Grow snake and increase speed.
     snake.GrowBody();
-  //  snake.speed += 0.02;
+    snake.speed += 0.02;
   }
   if (!queue->isEmpty())
   {
-    _SpecialMealSpecsInstance = std::move( queue->receive() );
-      if(_SpecialMealSpecsInstance.isReached)
+       auto temp_SpecialMealSpecsInstance = std::move( queue->receive() );
+      if(temp_SpecialMealSpecsInstance.isReached)
       {
           score += 3 ;
           LunchTime = false ;
@@ -105,10 +109,16 @@ void Game::Update() {
           snake.GrowBody();
           snake.speed += 0.02;
       }
-      else if (_SpecialMealSpecsInstance.timedOut)
+      else if (temp_SpecialMealSpecsInstance.timedOut)
       {
          LunchTime = false ;
       }
+      _SpecialMealSpecsInstance.isReached = temp_SpecialMealSpecsInstance.isReached;
+      _SpecialMealSpecsInstance.pos_x = temp_SpecialMealSpecsInstance.pos_x ; 
+      _SpecialMealSpecsInstance.pos_y = temp_SpecialMealSpecsInstance.pos_y ; 
+      _SpecialMealSpecsInstance.remainingTimeInSecs = temp_SpecialMealSpecsInstance.remainingTimeInSecs ; 
+      _SpecialMealSpecsInstance.rgb = temp_SpecialMealSpecsInstance.rgb ; 
+      _SpecialMealSpecsInstance.timedOut = temp_SpecialMealSpecsInstance.timedOut ; 
   }
 }
 
@@ -116,7 +126,7 @@ void Game::OrderSpecialMeal()
 {
   std::unique_ptr<SpecialMealInterface> SpecialMealIf = std::make_unique<SpecialMealInterface>(this->grid_width ,this->grid_height);
   
-  SpecialMealThreads =(std::async(std::launch::async,&SpecialMealInterface::RunSpecialMeal, std::move(SpecialMealIf) ,
+  SpecialMealThreads = (std::async(std::launch::async,&SpecialMealInterface::RunSpecialMeal, std::move(SpecialMealIf) ,
                         this->food.x, this->food.y, &this->snake , this->queue )) ;
 }
 int Game::GetScore() const { return score; }
