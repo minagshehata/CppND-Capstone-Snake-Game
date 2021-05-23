@@ -1,12 +1,35 @@
-# CPPND: Capstone Snake Game Example
+# CPPND: Capstone Snake Game Project with Special Meal Feature
 
 This is a starter repo for the Capstone project in the [Udacity C++ Nanodegree Program](https://www.udacity.com/course/c-plus-plus-nanodegree--nd213). The code for this repo was inspired by [this](https://codereview.stackexchange.com/questions/212296/snake-game-in-c-with-sdl) excellent StackOverflow post and set of responses.
 
 <img src="snake_game.gif"/>
 
-The Capstone Project gives you a chance to integrate what you've learned throughout this program. This project will become an important part of your portfolio to share with current and future colleagues and employers.
+## Added Feature 
+This version of snake game has extra feature that "after three successive trial to get the food ,
+There is an offer called "SpecialMeal" which is similar to the normal food but it increases the score by 3 points.
+But unfortunately it's limited to just 5 Seconds.
+You can differs the special one as its color blinking and countdown timer appears in the title bar.
 
-In this project, you can build your own C++ application or extend this Snake game, following the principles you have learned throughout this Nanodegree Program. This project will demonstrate that you can independently create applications using a wide range of C++ features.
+
+## Implementation and Changes Notes
+cmake :
+    1- Add the needed compiler flag "-pthread" and other flags requried by SDL2 Library
+
+game : 
+    1 - create class SpecialMealClass inherit specs from SDL_Point + timeout configuration
+    2 - create Message Queue class to handle data transferring between SpecialMealInterface class and game class
+    3 - create class SpecialMealInterface to handle Special Meal proccess in a parallel thread
+        has a unique pointer to SpecialMealClass to control the allocation and de allocation of the object in heap.
+    4 - add future instance as private member , which is used to trigger the concurrent processing.
+    5 - add grid_height , grid_width as a members in the game object 
+    6 - add LunchTime flag as new private member in game object
+    7 - add the needed implementation in update method of the game to trigger 
+    8 - add shared pointer to message queue class to handle the data transferring 
+    9 - add OrderSpecialMeal method to trigger the concurrent processing .
+
+render : 
+    1 - overload render method to take extra parameter of SpecialMealSpecs
+    2 - overload UpdateWindowTitle method to take extra parameter of SpecialMealSpecs
 
 ## Dependencies for Running Locally
 * cmake >= 3.7
