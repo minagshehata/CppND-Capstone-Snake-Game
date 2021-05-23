@@ -34,39 +34,77 @@ But unfortunately it's limited to just 5 Seconds.
 ## Rubric Points are addressed as following :
   * README Requirements :
     * The README is included with the project and has instructions for building/running the project.
+      * Point is Covered : already added based on the original repo.  
     * If any additional libraries are needed to run the project, these are indicated with cross-platform installation instructions.
+      * Point is Covered : already added based on the original repo.  
     * You can submit your writeup as markdown or pdf.
+      * Point is Covered : Done as modified MD file in the repo.
     * The README describes the project you have built.
+      * Point is Covered : sections *Added Feature* and *Implementation and changes notes* are covering the point.
     * The README also indicates the file and class structure, along with the expected behavior or output of the program.
+      * Point is Covered : sections *Added Feature* and *Implementation and changes notes* are covering the point.
     * The README indicates which rubric points are addressed. The README also indicates where in the code (i.e. files and line numbers) that the rubric points are addressed.
+      * Point is Covered : covered in this section.
   * Compiling and Testing :
+      * Point is Covered : The peiject is compiled and tested on both of my local machine and also the remote desktop provided by Udacity.
   * Loops, Functions, I/O :
     * A variety of control structures are used in the project.
+      * Point is Covered : In game.cpp . RunSpecialMeal() , PlaceSpecialMeal() are implemented with conditional statements to control the handling of the special meal.
+      * In game.cpp Game::update() is updated to trigger spicial meak thread and handle the message Queue also using control structure.
     * The project code is clearly organized into functions.
+      * Point is Covered : the new implementation in game.cpp is devided into thre new functions to organize the implementation according to the required functionality.
     * The project reads data from an external file or writes data to a file as part of the necessary operation of the program.
+      * Point isn't covered : As i couldn't find suitable context to read data from external files .
     * The project accepts input from a user as part of the necessary operation of the program.
+      * Point isn't covered in the new implementation but originally the controllers and SDL part is doing that job.
   * Object Oriented Programming : 
     * The project code is organized into classes with class attributes to hold the data, and class methods to perform tasks.
+      * Point is Covered : in game.h you can find the following new classes to serve the intended functionality. 
+          * game(just updated)
+          * MessageQueue
+          * SpecialMealClass
+          * SpecialMealInterface
     * All class data members are explicitly specified as public, protected, or private.
+      * Point is Covered : in game.h you can find all the new attributes of the following new classes are specified to be private or public
+          * game(just updated)
+          * MessageQueue
+          * SpecialMealClass
+          * SpecialMealInterface
     * All class members that are set to argument values are initialized through member initialization lists.
+      * Done for *SpecialMealInterface* in game.cpp
     * All class member functions document their effects, either through function names, comments, or formal documentation. Member functions do not change program state in undocumented ways.
+      * all the new implementation in game.cpp is well commented to show the intended behavior.
     * Appropriate data and functions are grouped into classes. Member data that is subject to an invariant is hidden from the user. State is accessed via member functions.
+      * class *SpecialMealInterface* in game.h is acting like user interface for the SpecialMealClass.
     * Inheritance hierarchies are logical. Composition is used instead of inheritance when appropriate. Abstract classes are composed of pure virtual functions. Override functions are specified.
+      * Class SpecialMealClass in game.h inherits from SDL point , for me it's logical as it's the same just add timeout parameter.
     * One function is overloaded with different signatures for the same function name.
+      * two functions are overloaded in render.h (Renderer::Render , Renderer::UpdateWindowTitle) 
     * One member function in an inherited class overrides a virtual base class member function.
+      * Not targeted.
     * One function is declared with a template that allows it to accept a generic parameter.
+      * Done for Message Queue Class in game.h . 
   * Memory Management : 
     * At least two variables are defined as references, or two functions use pass-by-reference in the project code.
+      * in game.cpp : RunSpecialMeal() and Send() functions are using refrencing to pass value.
     * At least one class that uses unmanaged dynamically allocated memory, along with any class that otherwise needs to modify state upon the termination of an object, uses a destructor.
     * The project follows the Resource Acquisition Is Initialization pattern where appropriate, by allocating objects at compile-time, initializing objects when they are declared, and utilizing scope to ensure their automatic destruction.
+      * in game.cpp , find *SpecialMealInterface*  use smart pointer ex:unique ptr to apply RAII and rule of 5.
     * For all classes, if any one of the copy constructor, copy assignment operator, move constructor, move assignment operator, and destructor are defined, then all of these functions are defined.
+      * No need as smart pointer handle all these stuffs.
     * For classes with move constructors, the project returns objects of that class by value, and relies on the move constructor, instead of copying the object.
+      * in game.cpp find the using of move semantics whe we use Send() function on message queue class and also for *SpecialMealIf* in function OrderSpecialMeal()
     * The project uses at least one smart pointer: unique_ptr, shared_ptr, or weak_ptr. The project does not use raw pointers.
+      * in game.h , *SpecialMealInterface*  
   * Concurrency : 
     * The project uses multiple threads in the execution.
+       * OrderSpecialMeal() function in game.ccp , invoke new thread by using std::async .
     * A promise and future is used to pass data from a worker thread to a parent thread in the project code.
+      * OrderSpecialMeal() function in game.ccp , future is directky used.
     * A mutex or lock (e.g. std::lock_guard or `std::unique_lock) is used to protect data that is shared across multiple threads in the project code.
+      * in game.h, find the implementation of MessageQueue class std::unique_lock<std::mutex> uLock(_mutex);
     * A std::condition_variable is used in the project code to synchronize thread execution.
+      * in game.h, _cond.wait and  _cond.notify_one(); are used in receive() and send() function in MessageQueue class.
 
 
 ## Dependencies for Running Locally

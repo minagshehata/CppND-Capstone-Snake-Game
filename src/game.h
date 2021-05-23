@@ -61,17 +61,15 @@ class SpecialMealInterface
 {
   private : 
     std::unique_ptr<SpecialMealClass> SpecialMealInstanse = std::make_unique<SpecialMealClass>(); 
-    
-
-  public :
-    SpecialMealInterface(std::size_t grid_width, std::size_t grid_height);
     void PlaceSpecialMeal(int food_x, int food_y , Snake snake) ;
-    void RunSpecialMeal( int food_x, int food_y ,Snake *snake, std::shared_ptr<MessageQueue<SpecialMealSpecs>> queue ) ;
     std::random_device dev;
     std::mt19937 engine;
     std::uniform_int_distribution<int> random_w;
-    std::uniform_int_distribution<int> random_h;
+    std::uniform_int_distribution<int> random_h;    
 
+  public :
+    SpecialMealInterface(std::size_t grid_width, std::size_t grid_height);
+    void RunSpecialMeal( int food_x, int food_y ,Snake *snake, std::shared_ptr<MessageQueue<SpecialMealSpecs>> queue ) ;
 };
 
 class Game {
